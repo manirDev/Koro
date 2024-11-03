@@ -1,6 +1,26 @@
 package Utils;
 
 public  class CONSTANT {
+
+    //Keywords
+    public static String K_AND = "et";
+    public static String K_CLASS = "classe";
+    public static String K_ELSE = "sinon";
+    public static String K_FALSE = "faux";
+    public static String K_FOR = "pour";
+    public static String K_FUN = "fon";
+    public static String K_IF = "si";
+    public static String K_NIL = "nul";
+    public static String K_OR = "ou";
+    public static String K_PRINT = "affichage";
+    public static String K_RETURN = "retourne";
+    public static String K_SUPER = "super";
+    public static String K_THIS = "ceci";
+    public static String K_TRUE = "vrai";
+    public static String K_VAR = "var";
+    public static String K_WHILE = "tant_que";
+
+
     public static char NEW_LINE = '\n';
     public static char TAB = '\t';
     public static char BLANK_SPACE = ' ';

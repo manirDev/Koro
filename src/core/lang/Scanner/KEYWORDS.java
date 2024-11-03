@@ -4,28 +4,29 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static Scanner.TokenType.*;
+import static Utils.CONSTANT.*;
 
 public class KEYWORDS {
     public static final Map<String, TokenType> keywords;
 
     static {
         keywords = new HashMap<>();
-        keywords.put("et",    AND);         // "and"
-        keywords.put("classe",  CLASS);       // "class"
-        keywords.put("sinon",   ELSE);        // "else"
-        keywords.put("faux",  FALSE);       // "false"
-        keywords.put("pour",    FOR);         // "for"
-        keywords.put("fon",    FUN);         // "fun"
-        keywords.put("si",     IF);          // "if"
-        keywords.put("nul",    NIL);         // "nil"
-        keywords.put("ou",     OR);          // "or"
-        keywords.put("print",  PRINT);       // "imprimer"
-        keywords.put("retourne", RETURN);      // "return"
-        keywords.put("super",  SUPER);       // "super"
-        keywords.put("this",   THIS);        // "ceci"
-        keywords.put("vrai",   TRUE);        // "true"
-        keywords.put("var",    VAR);         // "var"
-        keywords.put("tant_que",  WHILE);       // "while"
+        keywords.put(K_AND,    AND);
+        keywords.put(K_CLASS,  CLASS);
+        keywords.put(K_ELSE,   ELSE);
+        keywords.put(K_FALSE,  FALSE);
+        keywords.put(K_FOR,    FOR);
+        keywords.put(K_FUN,    FUN);
+        keywords.put(K_IF,     IF);
+        keywords.put(K_NIL,    NIL);
+        keywords.put(K_OR,     OR);
+        keywords.put(K_PRINT,  PRINT);
+        keywords.put(K_RETURN, RETURN);
+        keywords.put(K_SUPER,  SUPER);
+        keywords.put(K_THIS,   THIS);
+        keywords.put(K_TRUE,   TRUE);
+        keywords.put(K_VAR,    VAR);
+        keywords.put(K_WHILE,  WHILE);
     }
 
 }
