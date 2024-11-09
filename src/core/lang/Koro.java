@@ -16,6 +16,4 @@ public class Koro {
             promptRunner();
         }
     }
-
-
 }
