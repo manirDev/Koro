@@ -1,7 +1,7 @@
 import java.io.IOException;
 
-import static Run.Run.fileRunner;
-import static Run.Run.promptRunner;
+import static Runner.Runner.fileRunner;
+import static Runner.Runner.promptRunner;
 
 public class Koro {
     public static void main(String[] args) throws IOException {

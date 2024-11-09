@@ -1,4 +1,4 @@
-package Run;
+package Runner;
 
 import Scanner.Scanner;
 import Scanner.Token;
@@ -13,7 +13,7 @@ import java.util.List;
 
 import static Error.Error.hadError;
 
-public class Run {
+public class Runner {
     public static void fileRunner(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         runner(new String(bytes, Charset.defaultCharset()));
