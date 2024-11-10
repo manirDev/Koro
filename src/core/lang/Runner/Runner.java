@@ -1,5 +1,8 @@
 package Runner;
 
+import Ast.AstPrinter;
+import Ast.Expression.Expr;
+import Parser.Parser;
 import Scanner.Scanner;
 import Scanner.Token;
 
@@ -40,8 +43,17 @@ public class Runner {
     private static void runner(String sourceCode){
         Scanner scanner = new Scanner(sourceCode);
         List<Token> tokens = scanner.tokenize();
+        /* ==> Tokens Test
         for (Token token : tokens) {
             System.out.println(token.toString());
         }
+         */
+        Parser parser = new Parser(tokens);
+        Expr expression = parser.parse();
+        //Stop if there was a syntax error
+        if (hadError){
+            return;
+        }
+        System.out.println(new AstPrinter().print(expression));
     }
 }

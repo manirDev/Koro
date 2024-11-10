@@ -53,7 +53,7 @@ public class RpnPrinter implements ExprVisitor<String> {
                 new Binary(
                         new Literal(4),
                         new Token(TokenType.PLUS, "-", null, 1),
-                        new Literal(3)
+                        new Literal(null)
                 )
         );
         System.out.println(new RpnPrinter().print(expression));
