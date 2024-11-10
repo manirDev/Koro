@@ -2,6 +2,7 @@ package Runner;
 
 import Ast.AstPrinter;
 import Ast.Expression.Expr;
+import Interpreter.Interpreter;
 import Parser.Parser;
 import Scanner.Scanner;
 import Scanner.Token;
@@ -15,13 +16,18 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import static Error.Error.hadError;
+import static Error.RuntimeError.hadRuntimeError;
 
 public class Runner {
+    private static final Interpreter koroInterpreter = new Interpreter();
     public static void fileRunner(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         runner(new String(bytes, Charset.defaultCharset()));
         if (hadError){
             System.exit(65);
+        }
+        if (hadRuntimeError){
+            System.exit(70);
         }
     }
 
@@ -54,6 +60,7 @@ public class Runner {
         if (hadError){
             return;
         }
-        System.out.println(new AstPrinter().print(expression));
+        //System.out.println(new AstPrinter().print(expression));
+        koroInterpreter.interpret(expression);
     }
 }
