@@ -50,11 +50,11 @@ public class Runner {
     private static void runner(String sourceCode){
         Scanner scanner = new Scanner(sourceCode);
         List<Token> tokens = scanner.tokenize();
-        /* ==> Tokens Test
-        for (Token token : tokens) {
+        // ==> Tokens Test
+        /*for (Token token : tokens) {
             System.out.println(token.toString());
         }
-         */
+        */
         Parser parser = new Parser(tokens);
         List<Stmt> statements = parser.parse();
         //Stop if there was a syntax error
