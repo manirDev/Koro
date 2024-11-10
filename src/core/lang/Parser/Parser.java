@@ -1,10 +1,7 @@
 package Parser;
 
 import Ast.Expression.*;
-import Ast.Statement.Expression;
-import Ast.Statement.Print;
-import Ast.Statement.Stmt;
-import Ast.Statement.Var;
+import Ast.Statement.*;
 import Scanner.Token;
 import Scanner.TokenType;
 
@@ -32,7 +29,7 @@ public class Parser {
     }
 
     private Expr expression(){
-        return equality();
+        return assignment();
     }
 
     private Stmt declaration(){
@@ -62,6 +59,9 @@ public class Parser {
         if (match(PRINT)){
             return printStatement();
         }
+        if (match(OPEN_BRACE)){
+            return new Block(block());
+        }
         return expressionStatement();
     }
 
@@ -75,6 +75,29 @@ public class Parser {
         Expr expr = expression();
         consume(SEMICOLON, "Attendu ';' apres une expression");
         return new Expression(expr);
+    }
+
+    private List<Stmt> block(){
+        List<Stmt> statements = new ArrayList<>();
+        while (!check(CLOSE_BRACE) && !isAtEnd()){
+            statements.add(declaration());
+        }
+        consume(CLOSE_BRACE, "Un '}' est attendu après le bloc.");
+        return statements;
+    }
+
+    private Expr assignment(){
+        Expr expr = equality();
+        if (match(EQUAL)){
+            Token equals = previous();
+            Expr value = assignment();
+            if (expr instanceof Variable){
+                Token name = ((Variable)expr).name;
+                return new Assign(name, value);
+            }
+            error(equals, "Cible d'affectation invalide.");
+        }
+        return expr;
     }
 
     private Expr equality() {

@@ -51,9 +51,9 @@ public class Runner {
         Scanner scanner = new Scanner(sourceCode);
         List<Token> tokens = scanner.tokenize();
         // ==> Tokens Test
-        for (Token token : tokens) {
+        /*for (Token token : tokens) {
             System.out.println(token.toString());
-        }
+        }*/
 
         Parser parser = new Parser(tokens);
         List<Stmt> statements = parser.parse();
