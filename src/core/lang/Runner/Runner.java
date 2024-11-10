@@ -2,6 +2,7 @@ package Runner;
 
 import Ast.AstPrinter;
 import Ast.Expression.Expr;
+import Ast.Statement.Stmt;
 import Interpreter.Interpreter;
 import Parser.Parser;
 import Scanner.Scanner;
@@ -55,12 +56,12 @@ public class Runner {
         }
          */
         Parser parser = new Parser(tokens);
-        Expr expression = parser.parse();
+        List<Stmt> statements = parser.parse();
         //Stop if there was a syntax error
         if (hadError){
             return;
         }
         //System.out.println(new AstPrinter().print(expression));
-        koroInterpreter.interpret(expression);
+        koroInterpreter.interpret(statements);
     }
 }

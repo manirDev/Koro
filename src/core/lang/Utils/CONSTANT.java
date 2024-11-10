@@ -12,7 +12,7 @@ public  class CONSTANT {
     public static String K_IF = "si";
     public static String K_NIL = "nul";
     public static String K_OR = "ou";
-    public static String K_PRINT = "affichage";
+    public static String K_PRINT = "afficher";
     public static String K_RETURN = "retourne";
     public static String K_SUPER = "super";
     public static String K_THIS = "ceci";

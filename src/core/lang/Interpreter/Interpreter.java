@@ -1,21 +1,42 @@
 package Interpreter;
 
 import Ast.Expression.*;
+import Ast.Statement.Expression;
+import Ast.Statement.Print;
+import Ast.Statement.Stmt;
+import Ast.Statement.StmtVisitor;
 import Scanner.Token;
 import Error.RuntimeError;
 
+import java.util.List;
+
 import static Error.RuntimeError.runtimeError;
+import static Utils.CONSTANT.*;
 
-public class Interpreter implements ExprVisitor<Object> {
+public class Interpreter implements ExprVisitor<Object>, StmtVisitor<Void> {
 
-    public void interpret(Expr expression){
+    public void interpret(List<Stmt> statements){
         try{
-            Object value = evaluate(expression);
-            System.out.println(stringFy(value));
+            for (Stmt statement : statements){
+                execute(statement);
+            }
         }
         catch (RuntimeError error){
             runtimeError(error);
         }
+    }
+
+    @Override
+    public Void visitExpressionStmt(Expression stmt) {
+        evaluate(stmt.expression);
+        return null;
+    }
+
+    @Override
+    public Void visitPrintStmt(Print stmt) {
+        Object value = evaluate(stmt.expression);
+        System.out.println(stringFy(value));
+        return null;
     }
 
     @Override
@@ -46,25 +67,25 @@ public class Interpreter implements ExprVisitor<Object> {
             }
             case GREATER -> {
                 checkNumberOperands(expr.operator, left, right);
-                return (double)left > (double)right;
+                return (double)left > (double)right ? K_TRUE : K_FALSE;
             }
             case GREATER_EQUAL -> {
                 checkNumberOperands(expr.operator, left, right);
-                return (double)left >= (double)right;
+                return (double)left >= (double)right ? K_TRUE : K_FALSE;
             }
             case LESS -> {
                 checkNumberOperands(expr.operator, left, right);
-                return (double)left < (double)right;
+                return (double)left < (double)right ? K_TRUE : K_FALSE;
             }
             case LESS_EQUAL -> {
                 checkNumberOperands(expr.operator, left, right);
-                return (double)left <= (double)right;
+                return (double)left <= (double)right ? K_TRUE : K_FALSE;
             }
             case BANG_EQUAL -> {
-                return !isEqual(left, right);
+                return !isEqual(left, right) ? K_TRUE : K_FALSE;
             }
             case EQUAL_EQUAL -> {
-                return isEqual(left, right);
+                return isEqual(left, right) ? K_TRUE : K_FALSE;
             }
         }
         return null;
@@ -87,6 +108,9 @@ public class Interpreter implements ExprVisitor<Object> {
 
     @Override
     public Object visitLiteralExpr(Literal expr) {
+        if (expr.value instanceof Boolean){
+            return (boolean)expr.value ? K_TRUE : K_FALSE;
+        }
         return expr.value;
     }
 
@@ -97,6 +121,10 @@ public class Interpreter implements ExprVisitor<Object> {
 
     private Object evaluate(Expr expr){
         return expr.accept(this);
+    }
+
+    private void execute(Stmt stmt){
+        stmt.accept(this);
     }
 
     private boolean isTruthy(Object object){
@@ -146,4 +174,5 @@ public class Interpreter implements ExprVisitor<Object> {
         }
         return object.toString();
     }
+
 }

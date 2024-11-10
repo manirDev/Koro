@@ -1,9 +1,13 @@
 package Parser;
 
 import Ast.Expression.*;
+import Ast.Statement.Expression;
+import Ast.Statement.Print;
+import Ast.Statement.Stmt;
 import Scanner.Token;
 import Scanner.TokenType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import Error.ParseError;
@@ -18,17 +22,35 @@ public class Parser {
         this.tokens = tokens;
     }
 
-    public Expr parse(){
-        try {
-            return expression();
+    public List<Stmt> parse(){
+        List<Stmt> statements = new ArrayList<>();
+        while (!isAtEnd()){
+            statements.add(statement());
         }
-        catch (ParseError error){
-            return null;
-        }
+        return statements;
     }
 
     private Expr expression(){
         return equality();
+    }
+
+    private Stmt statement(){
+        if (match(PRINT)){
+            return printStatement();
+        }
+        return expressionStatement();
+    }
+
+    private Stmt printStatement(){
+        Expr value = expression();
+        consume(SEMICOLON, "Attendu ';' apres une valeur");
+        return new Print(value);
+    }
+
+    private Stmt expressionStatement(){
+        Expr expr = expression();
+        consume(SEMICOLON, "Attendu ';' apres une expression");
+        return new Expression(expr);
     }
 
     private Expr equality() {
