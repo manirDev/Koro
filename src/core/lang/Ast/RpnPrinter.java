@@ -31,6 +31,11 @@ public class RpnPrinter implements ExprVisitor<String> {
         return parenthesize("group", expr.expression);
     }
 
+    @Override
+    public String visitVariableExpr(Variable expr) {
+        return null;
+    }
+
     private String parenthesize(String name, Expr...exprs){
         StringBuilder builder = new StringBuilder();
         builder.append("(");

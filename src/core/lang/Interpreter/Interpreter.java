@@ -1,10 +1,8 @@
 package Interpreter;
 
 import Ast.Expression.*;
-import Ast.Statement.Expression;
-import Ast.Statement.Print;
-import Ast.Statement.Stmt;
-import Ast.Statement.StmtVisitor;
+import Ast.Statement.*;
+import Environment.Environment;
 import Scanner.Token;
 import Error.RuntimeError;
 
@@ -14,6 +12,7 @@ import static Error.RuntimeError.runtimeError;
 import static Utils.CONSTANT.*;
 
 public class Interpreter implements ExprVisitor<Object>, StmtVisitor<Void> {
+    private Environment environment = new Environment();
 
     public void interpret(List<Stmt> statements){
         try{
@@ -24,6 +23,16 @@ public class Interpreter implements ExprVisitor<Object>, StmtVisitor<Void> {
         catch (RuntimeError error){
             runtimeError(error);
         }
+    }
+
+    @Override
+    public Void visitVarStmt(Var stmt) {
+        Object value = null;
+        if (stmt.initializer != null){
+            value = evaluate(stmt.initializer);
+        }
+        environment.define(stmt.name.lexeme, value);
+        return null;
     }
 
     @Override
@@ -38,6 +47,7 @@ public class Interpreter implements ExprVisitor<Object>, StmtVisitor<Void> {
         System.out.println(stringFy(value));
         return null;
     }
+
 
     @Override
     public Object visitBinaryExpr(Binary expr) {
@@ -117,6 +127,11 @@ public class Interpreter implements ExprVisitor<Object>, StmtVisitor<Void> {
     @Override
     public Object visitGroupingExpr(Grouping expr) {
         return evaluate(expr.expression);
+    }
+
+    @Override
+    public Object visitVariableExpr(Variable expr) {
+        return environment.get(expr.name);
     }
 
     private Object evaluate(Expr expr){

@@ -5,4 +5,5 @@ public interface  ExprVisitor<T> {
     T visitUnaryExpr(Unary expr);
     T visitLiteralExpr(Literal expr);
     T visitGroupingExpr(Grouping expr);
+    T visitVariableExpr(Variable expr);
 }

@@ -4,6 +4,7 @@ import Ast.Expression.*;
 import Ast.Statement.Expression;
 import Ast.Statement.Print;
 import Ast.Statement.Stmt;
+import Ast.Statement.Var;
 import Scanner.Token;
 import Scanner.TokenType;
 
@@ -25,13 +26,36 @@ public class Parser {
     public List<Stmt> parse(){
         List<Stmt> statements = new ArrayList<>();
         while (!isAtEnd()){
-            statements.add(statement());
+            statements.add(declaration());
         }
         return statements;
     }
 
     private Expr expression(){
         return equality();
+    }
+
+    private Stmt declaration(){
+        try{
+            if (match(VAR)){
+                return varDeclaration();
+            }
+            return statement();
+        }
+        catch (ParseError error){
+            synchronize();
+            return null;
+        }
+    }
+
+    private Stmt varDeclaration(){
+        Token name = consume(IDENTIFIER, "Attend nom du variable");
+        Expr initializer = null;
+        if (match(EQUAL)){
+            initializer = expression();
+        }
+        consume(SEMICOLON, "Attendu ';' apres la declaration du variable");
+        return new Var(name, initializer);
     }
 
     private Stmt statement(){
@@ -120,6 +144,9 @@ public class Parser {
             Expr expr = expression();
             consume(CLOSE_PAREN, "Un ')' est attendu après l'expression.");
             return new Grouping(expr);
+        }
+        if (match(IDENTIFIER)){
+            return new Variable(previous());
         }
         throw error(peek(), "Est attendu une expression");
     }
