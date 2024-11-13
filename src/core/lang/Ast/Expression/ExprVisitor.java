@@ -7,4 +7,5 @@ public interface  ExprVisitor<T> {
     T visitGroupingExpr(Grouping expr);
     T visitVariableExpr(Variable expr);
     T visitAssignExpr(Assign expr);
+    T visitLogicalExpr(Logical expr);
 }

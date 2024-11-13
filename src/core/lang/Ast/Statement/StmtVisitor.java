@@ -5,4 +5,5 @@ public interface StmtVisitor <T>{
     T visitPrintStmt(Print stmt);
     T visitVarStmt(Var stmt);
     T visitBlockStmt(Block stmt);
+    T visitIfStmt(If stmt);
 }

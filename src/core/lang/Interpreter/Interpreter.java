@@ -5,6 +5,7 @@ import Ast.Statement.*;
 import Environment.Environment;
 import Scanner.Token;
 import Error.RuntimeError;
+import Scanner.TokenType;
 
 import java.util.List;
 
@@ -38,6 +39,17 @@ public class Interpreter implements ExprVisitor<Object>, StmtVisitor<Void> {
     @Override
     public Void visitBlockStmt(Block stmt) {
         executeBlock(stmt.statements, new Environment(environment));
+        return null;
+    }
+
+    @Override
+    public Void visitIfStmt(If stmt) {
+        if (isTruthy(evaluate(stmt.condition))){
+            execute(stmt.thenBranch);
+        }
+        else if (stmt.elseBranch != null){
+            execute(stmt.elseBranch);
+        }
         return null;
     }
 
@@ -158,6 +170,22 @@ public class Interpreter implements ExprVisitor<Object>, StmtVisitor<Void> {
         Object value = evaluate(expr.value);
         environment.assign(expr.name, value);
         return value;
+    }
+
+    @Override
+    public Object visitLogicalExpr(Logical expr) {
+        Object left = evaluate(expr.left);
+        if (expr.operator.tokenType == TokenType.OR){
+            if (isTruthy(left)){
+                return left;
+            }
+        }
+        else {
+            if (!isTruthy(left)){
+                return left;
+            }
+        }
+        return evaluate(expr.right);
     }
 
     private Object evaluate(Expr expr){
