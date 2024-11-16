@@ -6,7 +6,7 @@ import static Runner.Runner.promptRunner;
 public class Koro {
     public static void main(String[] args) throws IOException {
         if (args.length > 1) {
-            System.out.println("Utilisation: Koro [Script]");
+            System.out.println("Utilisation: Koro [Script] Lang");
             System.exit(64);
         }
         else if (args.length == 1) {

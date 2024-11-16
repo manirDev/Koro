@@ -137,8 +137,16 @@ public class Scanner {
         advance();
 
         //get the surrounding quotes
-        String value = sourceCode.substring(startPos + 1, currenPos - 1);
+        String rawValue = sourceCode.substring(startPos + 1, currenPos - 1);
+        String value = unescapeString(rawValue);
         push(STRING, value);
+    }
+    private String unescapeString(String rawString) {
+        return rawString
+                .replace("\\n", "\n")
+                .replace("\\t", "\t")
+                .replace("\\\"", "\"")
+                .replace("\\\\", "\\");
     }
     private void numberHandler(){
         while (isDigit(peek())){
@@ -165,6 +173,7 @@ public class Scanner {
         if (value == null){
             value = IDENTIFIER;
         }
+
         pushToken(value);
     }
     private boolean match(char expected){

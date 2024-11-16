@@ -5,12 +5,13 @@ import Ast.Statement.*;
 import Scanner.Token;
 import Scanner.TokenType;
 
+import java.sql.Array;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import Error.ParseError;
-import com.sun.nio.file.ExtendedOpenOption;
 
 import static Error.ParseError.error;
 import static Scanner.TokenType.*;
@@ -59,11 +60,17 @@ public class Parser {
     }
 
     private Stmt statement(){
+        if (match(FOR)){
+            return forStatement();
+        }
         if (match(IF)){
             return ifStatement();
         }
         if (match(PRINT)){
             return printStatement();
+        }
+        if (match(WHILE)){
+            return whileStatement();
         }
         if (match(OPEN_BRACE)){
             return new Block(block());
@@ -71,6 +78,49 @@ public class Parser {
         return expressionStatement();
     }
 
+    private Stmt forStatement(){
+        consume(OPEN_PAREN, "Attendu '(' apres une 'Pour' boucle");
+        Stmt initializer;
+        if (match(SEMICOLON)){
+            initializer = null;
+        }
+        else if(match(VAR)){
+            initializer = varDeclaration();
+        }
+        else {
+            initializer = expressionStatement();
+        }
+        Expr condition = null;
+        if (!check(SEMICOLON)){
+            condition = expression();
+        }
+        consume(SEMICOLON, "Attendu ';' apres une condition.");
+        Expr increment = null;
+        if (!check(CLOSE_PAREN)){
+            increment = expression();
+        }
+        consume(CLOSE_PAREN, "Attendu ')' apres une boucle 'Pour'.");
+        Stmt body = statement();
+
+        if (increment != null){
+            body = new Block(
+                    Arrays.asList(
+                            body,
+                            new Expression(increment)
+                    )
+            );
+        }
+        if (condition == null){
+            condition = new Literal(true);
+        }
+        body = new While(condition, body);
+
+        if (initializer != null){
+            body = new Block(Arrays.asList(initializer, body));
+        }
+
+        return body;
+    }
     private Stmt ifStatement(){
         consume(OPEN_PAREN, "Attendu '(' apres une 'Si'");
         Expr condition = expression();
@@ -87,6 +137,14 @@ public class Parser {
         Expr value = expression();
         consume(SEMICOLON, "Attendu ';' apres une valeur");
         return new Print(value);
+    }
+
+    private Stmt whileStatement(){
+        consume(OPEN_PAREN, "Attendu '(' apres une 'Tant_que'.");
+        Expr condition = expression();
+        consume(CLOSE_PAREN, "Attendu ')' apres une boucle 'Tant_que'");
+        Stmt body = statement();
+        return new While(condition, body);
     }
 
     private Stmt expressionStatement(){

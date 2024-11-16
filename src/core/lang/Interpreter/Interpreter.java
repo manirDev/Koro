@@ -1,5 +1,6 @@
 package Interpreter;
 
+import Ast.AstPrinter;
 import Ast.Expression.*;
 import Ast.Statement.*;
 import Environment.Environment;
@@ -44,6 +45,8 @@ public class Interpreter implements ExprVisitor<Object>, StmtVisitor<Void> {
 
     @Override
     public Void visitIfStmt(If stmt) {
+        AstPrinter printer = new AstPrinter();
+        //System.out.println(printer.print(stmt.condition));
         if (isTruthy(evaluate(stmt.condition))){
             execute(stmt.thenBranch);
         }
@@ -51,6 +54,14 @@ public class Interpreter implements ExprVisitor<Object>, StmtVisitor<Void> {
             execute(stmt.elseBranch);
         }
         return null;
+    }
+
+    @Override
+    public Void visitWhileStmt(While stmt) {
+        while (isTruthy(evaluate(stmt.condition))){
+            execute(stmt.body);
+        }
+        return  null;
     }
 
     private void executeBlock(List<Stmt> statements, Environment environment){
@@ -75,7 +86,11 @@ public class Interpreter implements ExprVisitor<Object>, StmtVisitor<Void> {
     @Override
     public Void visitPrintStmt(Print stmt) {
         Object value = evaluate(stmt.expression);
-        System.out.println(stringFy(value));
+        if (value instanceof String) {
+            System.out.print(stringFy(value));
+        } else {
+            System.out.print(stringFy(value));
+        }
         return null;
     }
 
@@ -200,9 +215,26 @@ public class Interpreter implements ExprVisitor<Object>, StmtVisitor<Void> {
         if (object == null){
             return false;
         }
+        if (object instanceof String){
+            String value = (String)object;
+            if (value.equals("vrai")){
+                return true;
+            }
+            return false;
+        }
         if (object instanceof Boolean){
             return (boolean)object;
         }
+        /*if (object instanceof String){
+            return !((String)object).isEmpty();
+        }
+        if (object instanceof Number){
+            Number numObj = (Number)object;
+            if (numObj.longValue() == 0 && numObj.doubleValue() != 0){
+                return true;
+            }
+            return numObj.longValue() != 0;
+        }*/
         return true;
     }
 
