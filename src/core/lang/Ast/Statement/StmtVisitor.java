@@ -7,4 +7,6 @@ public interface StmtVisitor <T>{
     T visitBlockStmt(Block stmt);
     T visitIfStmt(If stmt);
     T visitWhileStmt(While stmt);
+    T visitFunctionStmt(Function stmt);
+    T visitReturnStmt(Return stmt);
 }

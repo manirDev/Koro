@@ -12,9 +12,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import Error.ParseError;
+import com.sun.nio.file.ExtendedOpenOption;
 
 import static Error.ParseError.error;
 import static Scanner.TokenType.*;
+import static Utils.CONSTANT.ARG_SIZE;
 
 public class Parser {
     private final List<Token> tokens;
@@ -38,6 +40,9 @@ public class Parser {
 
     private Stmt declaration(){
         try{
+            if (match(FUN)){
+                return function("function");
+            }
             if (match(VAR)){
                 return varDeclaration();
             }
@@ -49,6 +54,24 @@ public class Parser {
         }
     }
 
+    private Function function(String kind){
+        Token name = consume(IDENTIFIER, "Attendu " + kind + " nom.");
+        consume(OPEN_PAREN, "Attendu '(' apres " + kind + " nom.");
+        List<Token> parameters = new ArrayList<>();
+        if (!check(CLOSE_PAREN)){
+            do {
+                if (parameters.size() >= ARG_SIZE){
+                    error(peek(), "Impossible d'avoir plus de " + ARG_SIZE + " paramètres.");
+                }
+                parameters.add(consume(IDENTIFIER, "Attendu le nom du parametre"));
+            }while (match(COMMA));
+        }
+        consume(CLOSE_PAREN, "Attendu ')' apres les parametres");
+
+        consume(OPEN_BRACE, "Attendu '(' apres " + kind + " corps.");
+        List<Stmt> body = block();
+        return new Function(name, parameters, body);
+    }
     private Stmt varDeclaration(){
         Token name = consume(IDENTIFIER, "Attend nom du variable");
         Expr initializer = null;
@@ -69,6 +92,9 @@ public class Parser {
         if (match(PRINT)){
             return printStatement();
         }
+        if (match(RETURN)){
+            return returnStatement();
+        }
         if (match(WHILE)){
             return whileStatement();
         }
@@ -76,6 +102,16 @@ public class Parser {
             return new Block(block());
         }
         return expressionStatement();
+    }
+
+    private Stmt returnStatement(){
+        Token keyword = previous();
+        Expr value = null;
+        if (!check(SEMICOLON)){
+            value = expression();
+        }
+        consume(SEMICOLON, "Attendu ';' apres une valeur retournee");
+        return new Return(keyword, value);
     }
 
     private Stmt forStatement(){
@@ -242,7 +278,20 @@ public class Parser {
             Expr right = unary();
             return new Unary(operator, right);
         }
-        return primary();
+        return call();
+    }
+
+    private Expr call(){
+        Expr expr = primary();
+        while (true){
+            if (match(OPEN_PAREN)){
+                expr = finishCall(expr);
+            }
+            else{
+                break;
+            }
+        }
+        return expr;
     }
 
     private Expr primary(){
@@ -268,6 +317,21 @@ public class Parser {
             return new Variable(previous());
         }
         throw error(peek(), "Est attendu une expression");
+    }
+
+    private Expr finishCall(Expr callee){
+        List<Expr> arguments = new ArrayList<>();
+        if (!check(CLOSE_PAREN)){
+            do{
+                if(arguments.size() >= ARG_SIZE){
+                    error(peek(), "Pas plus de " + ARG_SIZE + " arguments");
+                }
+                arguments.add(expression());
+            }while (match(COMMA));
+        }
+
+        Token paren = consume(CLOSE_PAREN, "Attendu ')' apres les arguments");
+        return new Call(callee, paren, arguments);
     }
 
     private void synchronize(){

@@ -8,4 +8,5 @@ public interface  ExprVisitor<T> {
     T visitVariableExpr(Variable expr);
     T visitAssignExpr(Assign expr);
     T visitLogicalExpr(Logical expr);
+    T visitCallExpr(Call expr);
 }

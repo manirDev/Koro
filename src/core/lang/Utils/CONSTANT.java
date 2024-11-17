@@ -13,7 +13,7 @@ public  class CONSTANT {
     public static String K_NIL = "nul";
     public static String K_OR = "ou";
     public static String K_PRINT = "afficher";
-    public static String K_RETURN = "retourner";
+    public static String K_RETURN = "retourne";
     public static String K_SUPER = "super";
     public static String K_THIS = "ceci";
     public static String K_TRUE = "vrai";
@@ -35,4 +35,6 @@ public  class CONSTANT {
     public static char UPPER_CASE_CHAR_UPPER_BOUND = 'Z';
     public static char DIGIT_LOWER_BOUND = '0';
     public static char DIGIT_UPPER_BOUND = '9';
+
+    public static final int ARG_SIZE = 255;
 }

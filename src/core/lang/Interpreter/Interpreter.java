@@ -4,17 +4,41 @@ import Ast.AstPrinter;
 import Ast.Expression.*;
 import Ast.Statement.*;
 import Environment.Environment;
+import Environment.KoroCallable;
+import Environment.KoroFunction;
 import Scanner.Token;
 import Error.RuntimeError;
 import Scanner.TokenType;
+import exception.ReturnVal;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static Error.RuntimeError.runtimeError;
 import static Utils.CONSTANT.*;
 
 public class Interpreter implements ExprVisitor<Object>, StmtVisitor<Void> {
-    private Environment environment = new Environment();
+    private final Environment globals = new Environment();
+    private Environment environment = globals;
+
+    public Interpreter(){
+        globals.define("clock", new KoroCallable() {
+            @Override
+            public int arity() {
+                return 0;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                return (double)System.currentTimeMillis() / 1000.0;
+            }
+
+            @Override
+            public String toString() {
+                return "<native fon>";
+            }
+        });
+    }
 
     public void interpret(List<Stmt> statements){
         try{
@@ -64,7 +88,23 @@ public class Interpreter implements ExprVisitor<Object>, StmtVisitor<Void> {
         return  null;
     }
 
-    private void executeBlock(List<Stmt> statements, Environment environment){
+    @Override
+    public Void visitFunctionStmt(Function stmt) {
+        KoroFunction function = new KoroFunction(stmt, environment);
+        environment.define(stmt.name.lexeme, function);
+        return null;
+    }
+
+    @Override
+    public Void visitReturnStmt(Return stmt) {
+        Object value = null;
+        if (stmt.value != null){
+            value = evaluate(stmt.value);
+        }
+        throw new ReturnVal(value);
+    }
+
+    public void executeBlock(List<Stmt> statements, Environment environment){
         Environment previous = this.environment;
         try{
             this.environment = environment;
@@ -117,7 +157,10 @@ public class Interpreter implements ExprVisitor<Object>, StmtVisitor<Void> {
                     return (double)left + (double)right;
                 }
                 if (left instanceof String && right instanceof String){
-                    return (String)left + (String)right;
+                    return left + (String)right;
+                }
+                if (left instanceof String || right instanceof String){
+                    return stringFy(left).concat(stringFy(right));
                 }
                 throw new RuntimeError(expr.operator, "Les opérandes doivent être deux nombres ou deux chaînes de caractères.");
             }
@@ -201,6 +244,29 @@ public class Interpreter implements ExprVisitor<Object>, StmtVisitor<Void> {
             }
         }
         return evaluate(expr.right);
+    }
+
+    @Override
+    public Object visitCallExpr(Call expr) {
+        Object callee = evaluate(expr.callee);
+        List<Object> arguments = new ArrayList<>();
+        for (Expr argument : expr.arguments){
+            arguments.add(evaluate(argument));
+        }
+        if (!(callee instanceof KoroCallable)){
+            throw new RuntimeError(expr.paren,
+                    "On peut seulement appeler des fonctions et des classes.");
+        }
+        KoroCallable function = (KoroCallable)callee;
+        if (arguments.size() != function.arity()){
+            throw new RuntimeError(
+                            expr.paren,
+                    "Attendu " +
+                            function.arity() + " arguments, mais reçu " +
+                            arguments.size() + "."
+                            );
+        }
+        return function.call(this, arguments);
     }
 
     private Object evaluate(Expr expr){
