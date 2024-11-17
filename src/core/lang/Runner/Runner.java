@@ -5,6 +5,7 @@ import Ast.Expression.Expr;
 import Ast.Statement.Stmt;
 import Interpreter.Interpreter;
 import Parser.Parser;
+import Resolver.Resolver;
 import Scanner.Scanner;
 import Scanner.Token;
 
@@ -48,19 +49,32 @@ public class Runner {
     }
 
     private static void runner(String sourceCode){
+        //==>Scanner
         Scanner scanner = new Scanner(sourceCode);
         List<Token> tokens = scanner.tokenize();
+
         // ==> Tokens Test
         /*for (Token token : tokens) {
             System.out.println(token.toString());
         }*/
 
+        //==>Parser
         Parser parser = new Parser(tokens);
         List<Stmt> statements = parser.parse();
+
         //Stop if there was a syntax error
         if (hadError){
             return;
         }
+
+        //==> Resolver
+        Resolver resolver = new Resolver(koroInterpreter);
+        resolver.resolve(statements);
+
+        if (hadError){
+            return;
+        }
+
         //System.out.println(new AstPrinter().print(expression));
         koroInterpreter.interpret(statements);
     }
